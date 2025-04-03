@@ -2,9 +2,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ShoppingCart, Menu, X, Search, Leaf } from 'lucide-react';
+import { useEcommerce } from '../contexts/EcommerceContext';
 
-const Navbar = ({ cartItemCount = 0 }) => {
+const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { cartItemCount } = useEcommerce();
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);

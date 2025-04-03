@@ -2,6 +2,8 @@
 import React from 'react';
 import { Leaf, Recycle, Cpu, TreePine, Wind, LifeBuoy } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import CarbonCalculator from '../components/CarbonCalculator';
+import InteractiveImpactSection from '../components/InteractiveImpactSection';
 
 const AboutPage = () => {
   const team = [
@@ -70,12 +72,34 @@ const AboutPage = () => {
       <section className="bg-eco-primary text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold mb-4">Our Mission</h1>
-            <p className="text-xl max-w-3xl mx-auto">
+            <h1 className="text-3xl md:text-4xl font-bold mb-4 animate-fade-in">Our Mission</h1>
+            <p className="text-xl max-w-3xl mx-auto animate-fade-in">
               At Eco-Mart Exchange Hub, we're committed to reducing electronic waste and carbon emissions
               by creating a platform that gives electronics a second life.
             </p>
           </div>
+        </div>
+      </section>
+
+      {/* Carbon Calculator Section */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-eco-dark mb-4">Our Carbon Footprint</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Transparency is key to sustainability. See how we're measuring and reducing 
+              our website's carbon emissions in real-time.
+            </p>
+          </div>
+          
+          <CarbonCalculator />
+        </div>
+      </section>
+
+      {/* Interactive Impact Section */}
+      <section className="py-16 bg-eco-light/20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <InteractiveImpactSection />
         </div>
       </section>
 
@@ -109,7 +133,7 @@ const AboutPage = () => {
               <img 
                 src="https://images.unsplash.com/photo-1603695762547-fba8b92b7e25?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=767&q=80" 
                 alt="Electronic devices being reused" 
-                className="rounded-lg shadow-lg"
+                className="rounded-lg shadow-lg hover-scale"
               />
             </div>
           </div>
@@ -129,7 +153,7 @@ const AboutPage = () => {
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {greenPrinciples.map((principle, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-md">
+              <div key={index} className="bg-white p-6 rounded-lg shadow-md eco-card-hover">
                 <div className="flex items-center justify-center h-16 w-16 rounded-full bg-eco-light mb-4">
                   {principle.icon}
                 </div>
@@ -137,57 +161,6 @@ const AboutPage = () => {
                 <p className="text-gray-600">{principle.description}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Carbon Emission Goals */}
-      <section className="py-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-eco-dark mb-4">Our Carbon Reduction Goals</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              We're committed to making a measurable impact on reducing carbon emissions 
-              through our business practices and the promotion of electronic reuse.
-            </p>
-          </div>
-          
-          <div className="bg-white p-8 rounded-lg shadow-md">
-            <div className="space-y-6">
-              <div>
-                <h3 className="text-xl font-semibold text-eco-dark mb-2">Platform Impact</h3>
-                <p className="text-gray-600">
-                  We aim to facilitate the reuse of 100,000 electronic devices by 2025, saving an estimated 
-                  4 million kg of CO₂ emissions compared to manufacturing new devices.
-                </p>
-              </div>
-              
-              <div>
-                <h3 className="text-xl font-semibold text-eco-dark mb-2">Operations</h3>
-                <p className="text-gray-600">
-                  Our infrastructure runs on 100% renewable energy, and we're working toward becoming a 
-                  carbon-negative company by 2024 through carbon offsets and sustainable business practices.
-                </p>
-              </div>
-              
-              <div>
-                <h3 className="text-xl font-semibold text-eco-dark mb-2">Education & Awareness</h3>
-                <p className="text-gray-600">
-                  We're committed to educating consumers about the environmental impact of electronics, 
-                  with a goal of helping our users reduce their personal carbon footprints by an average of 15%.
-                </p>
-              </div>
-              
-              <div className="pt-6 border-t border-gray-200">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-500">Progress toward 2025 goal:</span>
-                  <span className="text-sm font-medium text-eco-primary">15%</span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mt-2">
-                  <div className="bg-eco-primary h-2.5 rounded-full" style={{ width: '15%' }}></div>
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </section>
@@ -205,7 +178,7 @@ const AboutPage = () => {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
             {team.map((member, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md">
+              <div key={index} className="bg-white rounded-lg overflow-hidden shadow-md eco-card-hover">
                 <img 
                   src={member.image} 
                   alt={member.name} 
