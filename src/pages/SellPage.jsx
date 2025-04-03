@@ -2,13 +2,17 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEcommerce } from '../contexts/EcommerceContext';
-import { Upload, Check, AlertCircle, Info } from 'lucide-react';
+import { Upload, Check, AlertCircle, Info, Image as ImageIcon } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 const SellPage = () => {
   const { addNewProduct } = useEcommerce();
   const navigate = useNavigate();
   const [formSubmitted, setFormSubmitted] = useState(false);
   const [error, setError] = useState('');
+  const [previewImage, setPreviewImage] = useState(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -16,7 +20,7 @@ const SellPage = () => {
     price: '',
     category: '',
     condition: '',
-    image: '',
+    image: null,
     carbonSaved: '', // Estimated carbon savings
   });
   
@@ -28,6 +32,36 @@ const SellPage = () => {
         (value === '' ? '' : parseFloat(value)) : 
         value
     }));
+  };
+  
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    
+    if (!file) return;
+    
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      setError('Please select an image file');
+      return;
+    }
+    
+    // Check file size (limit to 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Image size should be less than 5MB');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      setPreviewImage(event.target.result);
+      setFormData(prev => ({
+        ...prev,
+        image: event.target.result
+      }));
+      setError(''); // Clear any previous errors
+    };
+    
+    reader.readAsDataURL(file);
   };
   
   const handleSubmit = async (e) => {
@@ -42,7 +76,7 @@ const SellPage = () => {
     
     try {
       // In a real app, we would upload the image to a storage service
-      // and get back a URL. For this demo, we'll just use the provided URL directly.
+      // and get back a URL. For this demo, we'll just use the base64 data directly.
       
       // Add the new product (would typically involve an API call)
       const newProduct = await addNewProduct({
@@ -51,6 +85,7 @@ const SellPage = () => {
       });
       
       setFormSubmitted(true);
+      toast.success("Product listing created successfully!");
       
       // In a real app, we would redirect to the product page
       setTimeout(() => {
@@ -58,6 +93,7 @@ const SellPage = () => {
       }, 3000);
     } catch (err) {
       setError('Failed to add product. Please try again.');
+      toast.error("Failed to add product. Please try again.");
     }
   };
   
@@ -256,34 +292,70 @@ const SellPage = () => {
                 </div>
               </div>
               
+              {/* Image Upload Section */}
               <div>
                 <label htmlFor="image" className="block text-sm font-medium text-gray-700">
-                  Image URL <span className="text-red-500">*</span>
+                  Product Image <span className="text-red-500">*</span>
                 </label>
-                <input
-                  type="text"
-                  name="image"
-                  id="image"
-                  value={formData.image}
-                  onChange={handleChange}
-                  className="mt-1 focus:ring-eco-primary focus:border-eco-primary block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                  placeholder="https://example.com/image.jpg"
-                  required
-                />
-                <p className="mt-1 text-xs text-gray-500">
-                  Please provide a URL for your product image. In a real app, you'd be able to upload directly.
-                </p>
+                <div className="mt-1 flex flex-col items-center space-y-4">
+                  {previewImage ? (
+                    <div className="relative w-full max-w-md aspect-video">
+                      <img 
+                        src={previewImage} 
+                        alt="Product preview" 
+                        className="w-full h-full object-cover rounded-md"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPreviewImage(null);
+                          setFormData(prev => ({ ...prev, image: null }));
+                        }}
+                        className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-full flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded-lg p-6 cursor-pointer hover:border-eco-primary transition-colors"
+                      onClick={() => document.getElementById('image').click()}
+                    >
+                      <ImageIcon className="h-12 w-12 text-gray-400" />
+                      <p className="mt-1 text-sm text-gray-600">Click to upload or drag and drop</p>
+                      <p className="mt-1 text-xs text-gray-500">PNG, JPG, GIF up to 5MB</p>
+                    </div>
+                  )}
+                  
+                  <Input
+                    type="file"
+                    id="image"
+                    name="image"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                    className="hidden"
+                  />
+                  
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => document.getElementById('image').click()}
+                    className="w-full md:w-auto"
+                  >
+                    <Upload className="mr-2 h-4 w-4" />
+                    Select Image
+                  </Button>
+                </div>
               </div>
             </div>
             
             <div className="mt-8 flex justify-end">
-              <button
+              <Button
                 type="submit"
                 className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-eco-primary hover:bg-eco-accent focus:outline-none transition-colors"
               >
                 <Upload className="mr-2 h-5 w-5" />
                 List for Sale
-              </button>
+              </Button>
             </div>
           </form>
         </div>
