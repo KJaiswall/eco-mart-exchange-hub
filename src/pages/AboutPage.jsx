@@ -4,6 +4,14 @@ import { Leaf, Recycle, Cpu, TreePine, Wind, LifeBuoy } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import CarbonCalculator from '../components/CarbonCalculator';
 import InteractiveImpactSection from '../components/InteractiveImpactSection';
+import GreenSoftwarePrinciples from '../components/GreenSoftwarePrinciples';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
 
 const AboutPage = () => {
   const team = [
@@ -33,36 +41,31 @@ const AboutPage = () => {
     }
   ];
 
-  const greenPrinciples = [
+  const milestones = [
     {
-      title: "Energy Efficiency",
-      description: "Our platform is designed with energy-efficient code and hosting solutions to minimize power consumption.",
-      icon: <Wind className="h-8 w-8 text-eco-primary" />
+      year: "2023",
+      title: "Launch of Eco-Mart",
+      description: "Started with a mission to reduce electronics waste through a sustainable marketplace."
     },
     {
-      title: "Reduce E-Waste",
-      description: "By facilitating the reuse of electronics, we help extend product lifecycles and reduce electronic waste.",
-      icon: <Recycle className="h-8 w-8 text-eco-primary" />
+      year: "2023",
+      title: "First 100 Transactions",
+      description: "Reached our first 100 successful product exchanges, saving 500kg of CO₂e."
     },
     {
-      title: "Sustainable Infrastructure",
-      description: "Our servers run on renewable energy and we prioritize cloud services with strong environmental commitments.",
-      icon: <Cpu className="h-8 w-8 text-eco-primary" />
+      year: "2024",
+      title: "Carbon Calculation Feature",
+      description: "Launched our real-time carbon savings calculator for each product."
     },
     {
-      title: "Carbon Transparency",
-      description: "We calculate and display the carbon savings for each product to encourage environmentally conscious decisions.",
-      icon: <TreePine className="h-8 w-8 text-eco-primary" />
+      year: "2024",
+      title: "Community Recycling Initiative",
+      description: "Partnered with 10 local communities to establish e-waste collection points."
     },
     {
-      title: "Green Software Practices",
-      description: "We follow green software engineering principles like efficient algorithms and sustainable development practices.",
-      icon: <Leaf className="h-8 w-8 text-eco-primary" />
-    },
-    {
-      title: "Community Impact",
-      description: "We donate a portion of our proceeds to environmental causes and e-waste recycling programs.",
-      icon: <LifeBuoy className="h-8 w-8 text-eco-primary" />
+      year: "2025",
+      title: "Sustainable Packaging",
+      description: "Implemented 100% plastic-free, compostable packaging for all shipments."
     }
   ];
 
@@ -100,6 +103,38 @@ const AboutPage = () => {
       <section className="py-16 bg-eco-light/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <InteractiveImpactSection />
+        </div>
+      </section>
+
+      {/* Milestones Carousel */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold text-eco-dark mb-4">Our Journey</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Tracing our path toward a more sustainable future for electronics
+            </p>
+          </div>
+          
+          <Carousel className="w-full">
+            <CarouselContent>
+              {milestones.map((milestone, index) => (
+                <CarouselItem key={index} className="md:basis-1/2 lg:basis-1/3 pl-4">
+                  <div className="bg-eco-light/30 p-6 rounded-lg shadow-sm h-full">
+                    <div className="bg-eco-primary text-white text-sm font-semibold inline-block px-3 py-1 rounded mb-3">
+                      {milestone.year}
+                    </div>
+                    <h3 className="text-xl font-semibold text-eco-dark mb-2">{milestone.title}</h3>
+                    <p className="text-gray-600">{milestone.description}</p>
+                  </div>
+                </CarouselItem>
+              ))}
+            </CarouselContent>
+            <div className="flex items-center justify-center mt-4">
+              <CarouselPrevious className="relative static mr-2" />
+              <CarouselNext className="relative static ml-2" />
+            </div>
+          </Carousel>
         </div>
       </section>
 
@@ -141,29 +176,7 @@ const AboutPage = () => {
       </section>
 
       {/* Green Software Principles */}
-      <section className="py-16 bg-eco-light">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-eco-dark mb-4">Green Software Principles</h2>
-            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-              Our platform is built following sustainable software engineering practices to minimize 
-              our environmental footprint while providing an exceptional user experience.
-            </p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {greenPrinciples.map((principle, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-md eco-card-hover">
-                <div className="flex items-center justify-center h-16 w-16 rounded-full bg-eco-light mb-4">
-                  {principle.icon}
-                </div>
-                <h3 className="text-xl font-semibold text-eco-dark mb-2">{principle.title}</h3>
-                <p className="text-gray-600">{principle.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <GreenSoftwarePrinciples />
 
       {/* Team Section */}
       <section className="py-16 bg-gray-50">
