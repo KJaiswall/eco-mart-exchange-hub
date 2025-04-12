@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Leaf, Facebook, Twitter, Instagram, Mail } from 'lucide-react';
+import { ShoppingBag, Facebook, Twitter, Instagram, Mail } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -10,11 +9,11 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           <div className="md:col-span-1">
             <Link to="/" className="flex items-center">
-              <Leaf className="h-8 w-8 text-white" />
-              <span className="ml-2 text-xl font-bold">Eco-Mart</span>
+              <ShoppingBag className="h-8 w-8 text-white" />
+              <span className="ml-2 text-xl font-bold">QuickCart</span>
             </Link>
             <p className="mt-3 text-sm opacity-90">
-              Making the world greener through sustainable electronics exchange and reuse.
+              Simplifying sustainable shopping with a quick and eco-friendly marketplace.
             </p>
             <div className="mt-6 flex space-x-4">
               <a href="#" className="text-white hover:text-eco-light transition-colors">
@@ -113,7 +112,7 @@ const Footer = () => {
         
         <div className="mt-12 pt-8 border-t border-green-600">
           <p className="text-center text-sm opacity-90">
-            &copy; {new Date().getFullYear()} Eco-Mart Exchange Hub. All rights reserved.
+            &copy; {new Date().getFullYear()} QuickCart. All rights reserved.
           </p>
           <p className="text-center text-xs mt-2 opacity-75">
             Helping reduce e-waste one product at a time.
