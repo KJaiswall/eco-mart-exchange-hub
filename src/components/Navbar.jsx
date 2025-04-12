@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart, Menu, X, Search, Leaf } from 'lucide-react';
+import { ShoppingCart, Menu, X, Search, Cpu } from 'lucide-react';
 import { useEcommerce } from '../contexts/EcommerceContext';
 
 const Navbar = () => {
@@ -18,8 +18,8 @@ const Navbar = () => {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link to="/" className="flex-shrink-0 flex items-center">
-              <Leaf className="h-8 w-8 text-eco-primary" />
-              <span className="ml-2 text-xl font-bold text-eco-primary">Eco-Mart</span>
+              <Cpu className="h-8 w-8 text-eco-primary" />
+              <span className="ml-2 text-xl font-bold text-eco-primary">TechCycle</span>
             </Link>
             
             <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
