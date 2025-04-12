@@ -8,7 +8,7 @@ const ProductGrid = ({
   addToCart,
   resetFilters 
 }) => {
-  if (filteredProducts.length === 0) {
+  if (!filteredProducts || filteredProducts.length === 0) {
     return (
       <div className="text-center py-12 bg-white rounded-lg shadow-sm">
         <div className="w-16 h-16 mx-auto bg-gray-200 rounded-full flex items-center justify-center mb-4">

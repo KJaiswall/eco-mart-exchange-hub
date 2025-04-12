@@ -46,7 +46,7 @@ export async function addToCart(userId = 'guest', product) {
         carbonSaved: product.carbonSaved,
         seller: product.seller,
         quantity: 1,
-        addedAt: new Date()
+        addedAt: new Date().toISOString()
       });
       toast.success("Item added to cart");
     }

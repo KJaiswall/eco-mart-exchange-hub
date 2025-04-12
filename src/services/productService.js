@@ -24,8 +24,8 @@ export async function addProduct(productData) {
     
     const newProduct = {
       ...productData,
-      createdAt: new Date(),
-      listedDate: new Date()
+      createdAt: new Date().toISOString(),
+      listedDate: new Date().toISOString()
     };
     
     const result = await collection.insertOne(newProduct);

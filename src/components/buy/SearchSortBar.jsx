@@ -19,7 +19,7 @@ const SearchSortBar = ({
           </div>
           <input
             type="text"
-            value={searchTerm}
+            value={searchTerm || ""}
             onChange={e => setSearchTerm(e.target.value)}
             className="focus:ring-eco-primary focus:border-eco-primary block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md"
             placeholder="Search for products..."
@@ -28,7 +28,7 @@ const SearchSortBar = ({
         
         <div className="flex items-center gap-2">
           <select
-            value={sortBy}
+            value={sortBy || ""}
             onChange={e => setSortBy(e.target.value)}
             className="focus:ring-eco-primary focus:border-eco-primary border border-gray-300 rounded-md py-2 pr-8 pl-3 text-sm"
           >
