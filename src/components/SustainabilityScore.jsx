@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { info } from 'lucide-react';
+import { Info } from 'lucide-react';
 
 const SustainabilityScore = ({ product }) => {
   // Calculate a sustainability score based on product attributes
@@ -62,7 +62,7 @@ const SustainabilityScore = ({ product }) => {
         <div className="flex items-center">
           <span className="text-sm font-medium text-gray-700">Sustainability Score</span>
           <div className="relative ml-1 group">
-            <info className="h-4 w-4 text-gray-400 cursor-help" />
+            <Info className="h-4 w-4 text-gray-400 cursor-help" />
             <div className="absolute bottom-full mb-2 left-1/2 transform -translate-x-1/2 invisible group-hover:visible 
                         bg-gray-800 text-white text-xs rounded py-1 px-2 w-48 z-10">
               Score calculated based on carbon savings, product condition, and category-specific factors.
