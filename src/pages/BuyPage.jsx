@@ -2,11 +2,13 @@
 import React, { useState, useEffect } from 'react';
 import { useEcommerce } from '../contexts/EcommerceContext';
 import ProductCard from '../components/ProductCard';
-import { Filter, Search, ChevronDown, Sliders, SlidersHorizontal } from 'lucide-react';
+import { Filter, Search, ChevronDown, Sliders, SlidersHorizontal, BarChart3, Leaf } from 'lucide-react';
 import { Slider } from "@/components/ui/slider";
+import { toast } from "sonner";
+import UniqueFeatures from '../components/UniqueFeatures';
 
 const BuyPage = () => {
-  const { products, addToCart } = useEcommerce();
+  const { products, addToCart, isLoading, errorMessage } = useEcommerce();
   const [filteredProducts, setFilteredProducts] = useState(products);
   const [searchTerm, setSearchTerm] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('');
@@ -17,6 +19,7 @@ const BuyPage = () => {
   const [priceRange, setPriceRange] = useState([0, 1000]);
   const [sortBy, setSortBy] = useState('');
   const [carbonSavingsFilter, setCarbonSavingsFilter] = useState('');
+  const [sustainabilityFilter, setSustainabilityFilter] = useState('');
 
   // Extract unique categories and conditions for filters
   const categories = [...new Set(products.map(p => p.category))];
@@ -25,6 +28,13 @@ const BuyPage = () => {
   
   // Max price for range calculation
   const maxPrice = Math.max(...products.map(p => p.price), 1000);
+
+  // Show connection status toast on first load
+  useEffect(() => {
+    if (errorMessage) {
+      toast.error(errorMessage);
+    }
+  }, [errorMessage]);
 
   // Apply filters whenever filter state changes
   useEffect(() => {
@@ -75,6 +85,27 @@ const BuyPage = () => {
       }
     }
     
+    // Apply sustainability filter (this would work with our new SustainabilityScore component)
+    if (sustainabilityFilter) {
+      switch(sustainabilityFilter) {
+        case 'excellent':
+          // Products that are refurbished and have high carbon savings
+          results = results.filter(product => 
+            product.condition === 'Refurbished' && product.carbonSaved >= 50
+          );
+          break;
+        case 'good':
+          // Products that are either refurbished or have decent carbon savings
+          results = results.filter(product => 
+            product.condition === 'Refurbished' || 
+            (product.condition === 'Like New' && product.carbonSaved >= 20)
+          );
+          break;
+        default:
+          break;
+      }
+    }
+    
     // Apply sorting
     if (sortBy) {
       switch(sortBy) {
@@ -96,7 +127,7 @@ const BuyPage = () => {
     }
     
     setFilteredProducts(results);
-  }, [searchTerm, categoryFilter, conditionFilter, priceFilter, products, priceRange, sortBy, carbonSavingsFilter]);
+  }, [searchTerm, categoryFilter, conditionFilter, priceFilter, products, priceRange, sortBy, carbonSavingsFilter, sustainabilityFilter]);
 
   const resetFilters = () => {
     setSearchTerm('');
@@ -106,11 +137,24 @@ const BuyPage = () => {
     setPriceRange([0, maxPrice]);
     setSortBy('');
     setCarbonSavingsFilter('');
+    setSustainabilityFilter('');
   };
 
   const handlePriceChange = (value) => {
     setPriceRange(value);
   };
+
+  // Display loading state if products are being loaded
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 py-10 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-16 h-16 border-4 border-eco-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-eco-dark font-medium">Loading sustainable products...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 py-10">
@@ -122,6 +166,9 @@ const BuyPage = () => {
             Each purchase contributes to reducing e-waste and carbon emissions.
           </p>
         </div>
+        
+        {/* Unique Features Section */}
+        <UniqueFeatures />
         
         {/* Search and Mobile Filters Toggle */}
         <div className="mb-8">
@@ -314,6 +361,57 @@ const BuyPage = () => {
                       />
                       <label htmlFor="carbon-low" className="ml-2 text-sm text-gray-700">
                         Low Impact (&lt;5kg CO₂e)
+                      </label>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* New Sustainability Rating Filter */}
+                <div>
+                  <h4 className="font-medium text-sm text-gray-700 mb-2">Sustainability Rating</h4>
+                  <div className="space-y-2">
+                    <div className="flex items-center">
+                      <input
+                        id="all-sustainability"
+                        type="radio"
+                        name="sustainability"
+                        checked={sustainabilityFilter === ''}
+                        onChange={() => setSustainabilityFilter('')}
+                        className="h-4 w-4 text-eco-primary"
+                      />
+                      <label htmlFor="all-sustainability" className="ml-2 text-sm text-gray-700">
+                        All Ratings
+                      </label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        id="sustainability-excellent"
+                        type="radio"
+                        name="sustainability"
+                        checked={sustainabilityFilter === 'excellent'}
+                        onChange={() => setSustainabilityFilter('excellent')}
+                        className="h-4 w-4 text-eco-primary"
+                      />
+                      <label htmlFor="sustainability-excellent" className="ml-2 text-sm text-gray-700 flex items-center">
+                        <Leaf className="h-3 w-3 text-green-500 mr-1" />
+                        <Leaf className="h-3 w-3 text-green-500 mr-1" />
+                        <Leaf className="h-3 w-3 text-green-500" />
+                        <span className="ml-1">Excellent</span>
+                      </label>
+                    </div>
+                    <div className="flex items-center">
+                      <input
+                        id="sustainability-good"
+                        type="radio"
+                        name="sustainability"
+                        checked={sustainabilityFilter === 'good'}
+                        onChange={() => setSustainabilityFilter('good')}
+                        className="h-4 w-4 text-eco-primary"
+                      />
+                      <label htmlFor="sustainability-good" className="ml-2 text-sm text-gray-700 flex items-center">
+                        <Leaf className="h-3 w-3 text-green-500 mr-1" />
+                        <Leaf className="h-3 w-3 text-green-500" />
+                        <span className="ml-1">Good</span>
                       </label>
                     </div>
                   </div>

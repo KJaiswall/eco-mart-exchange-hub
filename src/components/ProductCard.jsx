@@ -1,13 +1,37 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { CheckCircle, ShoppingCart, Recycle } from 'lucide-react';
+import { CheckCircle, ShoppingCart, Recycle, Award, Cpu, Shield } from 'lucide-react';
+import SustainabilityScore from './SustainabilityScore';
 
 const ProductCard = ({ product, onAddToCart }) => {
-  const { id, title, price, image, condition, carbonSaved } = product;
+  const { id, title, price, image, condition, carbonSaved, seller } = product;
+
+  // Determine badge for seller verification
+  const getSellerBadge = () => {
+    // This would typically be based on seller ratings/verification in a real application
+    const verifiedSellers = ['EcoTech', 'GreenHome', 'RenewTech', 'SolarPower'];
+    const isVerified = verifiedSellers.includes(seller);
+    
+    if (isVerified) {
+      return (
+        <div className="absolute top-2 left-2 bg-eco-primary bg-opacity-90 px-2 py-1 rounded-full 
+                      text-white text-xs font-medium flex items-center z-10">
+          <Award className="w-3 h-3 mr-1" />
+          Verified Seller
+        </div>
+      );
+    }
+    return null;
+  };
+
+  // Determine if product has warranty
+  const hasWarranty = condition === 'Refurbished' || condition === 'New';
 
   return (
-    <div className="bg-white rounded-lg overflow-hidden shadow-md eco-card-hover border border-gray-100">
+    <div className="bg-white rounded-lg overflow-hidden shadow-md eco-card-hover border border-gray-100 relative">
+      {getSellerBadge()}
+      
       <div className="relative">
         <img 
           src={image} 
@@ -35,8 +59,18 @@ const ProductCard = ({ product, onAddToCart }) => {
       
       <div className="p-4">
         <h3 className="text-lg font-medium text-gray-900 mb-1">{title}</h3>
-        <div className="flex items-baseline mt-1 mb-2">
+        
+        <SustainabilityScore product={product} />
+        
+        <div className="flex items-baseline mt-2 mb-2">
           <span className="text-eco-primary text-xl font-semibold">${price.toFixed(2)}</span>
+          
+          {hasWarranty && (
+            <span className="ml-2 text-xs text-gray-600 flex items-center">
+              <Shield className="w-3 h-3 mr-1" />
+              {condition === 'Refurbished' ? '1yr warranty' : '2yr warranty'}
+            </span>
+          )}
         </div>
         
         <div className="flex justify-between items-center mt-4">
@@ -50,7 +84,7 @@ const ProductCard = ({ product, onAddToCart }) => {
           <button 
             onClick={() => onAddToCart(product)}
             className="inline-flex items-center px-3 py-1.5 border border-transparent text-xs 
-                     font-medium rounded-md text-white bg-eco-primary hover:bg-eco-accent"
+                     font-medium rounded-md text-white bg-eco-primary hover:bg-eco-accent transition-colors"
           >
             <ShoppingCart className="h-4 w-4 mr-1" />
             Add to Cart
