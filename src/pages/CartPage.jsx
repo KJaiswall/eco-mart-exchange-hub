@@ -2,25 +2,59 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEcommerce } from '../contexts/EcommerceContext';
-import { Trash2, Plus, Minus, CreditCard, AlertCircle, ArrowRight } from 'lucide-react';
+import { Trash2, Plus, Minus, CreditCard, AlertCircle, ArrowRight, CheckCircle, User, MapPin, Phone, Mail } from 'lucide-react';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { useForm } from "react-hook-form";
+import { Alert, AlertTitle, AlertDescription } from "@/components/ui/alert";
 
 const CartPage = () => {
   const { cart, removeFromCart, updateQuantity, cartTotal } = useEcommerce();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
+  const [showCheckoutForm, setShowCheckoutForm] = useState(false);
+  const [orderSuccess, setOrderSuccess] = useState(false);
+
+  const form = useForm({
+    defaultValues: {
+      fullName: "",
+      email: "",
+      phone: "",
+      address: "",
+      city: "",
+      state: "",
+      zipCode: "",
+      notes: ""
+    }
+  });
 
   const handleCheckout = () => {
-    // In a real app, this would handle the Stripe or Razorpay integration
-    setIsCheckingOut(true);
+    setIsCheckingOut(false);
     setCheckoutError('');
+    setShowCheckoutForm(true);
+  };
+
+  const onSubmitCheckoutForm = (data) => {
+    // In a real app, this would send the order data to a backend
+    console.log("Order data:", data);
+    console.log("Cart items:", cart);
     
-    // Simulate payment processing
+    // Simulate processing
+    setIsCheckingOut(true);
+    
+    // Simulate success after a short delay
     setTimeout(() => {
-      // For demo purposes, we'll simulate success
       setIsCheckingOut(false);
-      // In a real app, would redirect to confirmation page or show success message
-      alert('For this demo, we are simulating a successful payment! In a real app, this would integrate with Stripe or Razorpay.');
-    }, 2000);
+      setShowCheckoutForm(false);
+      setOrderSuccess(true);
+    }, 1500);
+  };
+
+  const handleCloseSuccessDialog = () => {
+    setOrderSuccess(false);
   };
 
   if (cart.length === 0) {
@@ -198,7 +232,7 @@ const CartPage = () => {
                     ) : (
                       <>
                         <CreditCard className="mr-2 h-5 w-5" />
-                        Checkout
+                        Proceed to Checkout
                       </>
                     )}
                   </button>
@@ -229,6 +263,197 @@ const CartPage = () => {
           </div>
         </div>
       </div>
+
+      {/* Checkout Form Dialog */}
+      <Dialog open={showCheckoutForm} onOpenChange={setShowCheckoutForm}>
+        <DialogContent className="sm:max-w-[625px]">
+          <DialogHeader>
+            <DialogTitle>Complete Your Order</DialogTitle>
+            <DialogDescription>
+              Please provide your delivery information to complete your purchase.
+            </DialogDescription>
+          </DialogHeader>
+
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmitCheckoutForm)} className="space-y-4 mt-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="fullName"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <User className="h-4 w-4 mr-2" /> Full Name
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="John Doe" required {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <Mail className="h-4 w-4 mr-2" /> Email
+                      </FormLabel>
+                      <FormControl>
+                        <Input type="email" placeholder="you@example.com" required {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="phone"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <Phone className="h-4 w-4 mr-2" /> Phone
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="(123) 456-7890" required {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="address"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="flex items-center">
+                        <MapPin className="h-4 w-4 mr-2" /> Address
+                      </FormLabel>
+                      <FormControl>
+                        <Input placeholder="123 Main St" required {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="city"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>City</FormLabel>
+                      <FormControl>
+                        <Input placeholder="San Francisco" required {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="state"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>State</FormLabel>
+                      <FormControl>
+                        <Input placeholder="California" required {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="zipCode"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Zip Code</FormLabel>
+                      <FormControl>
+                        <Input placeholder="94103" required {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={form.control}
+                name="notes"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Order Notes (Optional)</FormLabel>
+                    <FormControl>
+                      <Textarea 
+                        placeholder="Special delivery instructions or any other notes" 
+                        {...field} 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <div className="flex justify-end space-x-2 pt-4">
+                <Button 
+                  type="button" 
+                  variant="outline" 
+                  onClick={() => setShowCheckoutForm(false)}
+                >
+                  Cancel
+                </Button>
+                <Button 
+                  type="submit" 
+                  disabled={isCheckingOut}
+                >
+                  {isCheckingOut ? "Processing..." : "Complete Order"}
+                </Button>
+              </div>
+            </form>
+          </Form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Order Success Dialog */}
+      <Dialog open={orderSuccess} onOpenChange={handleCloseSuccessDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center text-green-600">
+              <CheckCircle className="h-6 w-6 mr-2" />
+              Order Placed Successfully!
+            </DialogTitle>
+          </DialogHeader>
+
+          <div className="py-4">
+            <Alert className="border-green-100 bg-green-50">
+              <CheckCircle className="h-4 w-4 text-green-600" />
+              <AlertTitle className="text-green-800">Thank you for your order!</AlertTitle>
+              <AlertDescription className="text-green-700">
+                Your order has been placed successfully. We'll send you a confirmation email shortly.
+              </AlertDescription>
+            </Alert>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-600 mb-6">
+                Your order number: <span className="font-semibold">ORD-{Math.floor(Math.random() * 10000).toString().padStart(4, '0')}</span>
+              </p>
+              <Button onClick={() => {
+                handleCloseSuccessDialog();
+                // In a real app, this would clear the cart after successful order
+              }}>
+                Continue Shopping
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

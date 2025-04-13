@@ -136,6 +136,12 @@ export const EcommerceProvider = ({ children }) => {
     );
   };
 
+  // Clear entire cart (for after successful order)
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('eco_mart_cart');
+  };
+
   // Calculate total items in cart
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
   
@@ -163,6 +169,7 @@ export const EcommerceProvider = ({ children }) => {
     addToCart,
     removeFromCart,
     updateQuantity,
+    clearCart,
     addNewProduct
   };
 
