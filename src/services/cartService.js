@@ -13,6 +13,7 @@ export async function getCartItems(userId = 'guest') {
   } catch (error) {
     console.error("Failed to fetch cart items:", error);
     toast.error("Failed to load your cart");
+    // Return empty array even on error to prevent UI breakage
     return [];
   }
 }
@@ -51,11 +52,15 @@ export async function addToCart(userId = 'guest', product) {
       toast.success("Item added to cart");
     }
     
+    // Get updated cart items
     return await getCartItems(userId);
   } catch (error) {
     console.error("Failed to add item to cart:", error);
     toast.error("Failed to add item to cart");
-    throw error;
+    
+    // Return the current cart state instead of throwing the error
+    // This prevents breaking the UI flow
+    return await getCartItems(userId);
   }
 }
 
@@ -68,7 +73,8 @@ export async function removeFromCart(userId = 'guest', productId) {
   } catch (error) {
     console.error("Failed to remove item from cart:", error);
     toast.error("Failed to remove item");
-    throw error;
+    // Return current cart items instead of throwing
+    return await getCartItems(userId);
   }
 }
 
@@ -86,7 +92,8 @@ export async function updateCartItemQuantity(userId = 'guest', productId, quanti
   } catch (error) {
     console.error("Failed to update item quantity:", error);
     toast.error("Failed to update quantity");
-    throw error;
+    // Return current cart items instead of throwing
+    return await getCartItems(userId);
   }
 }
 
@@ -99,6 +106,7 @@ export async function clearCart(userId = 'guest') {
   } catch (error) {
     console.error("Failed to clear cart:", error);
     toast.error("Failed to clear cart");
-    throw error;
+    // Return empty array instead of throwing
+    return [];
   }
 }
