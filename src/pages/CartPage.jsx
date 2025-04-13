@@ -2,44 +2,26 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useEcommerce } from '../contexts/EcommerceContext';
-import { Trash2, Plus, Minus, CreditCard, AlertCircle, ArrowRight, Leaf, Shield, Award } from 'lucide-react';
-import { toast } from "sonner";
+import { Trash2, Plus, Minus, CreditCard, AlertCircle, ArrowRight } from 'lucide-react';
 
 const CartPage = () => {
-  const { cart, removeFromCart, updateQuantity, cartTotal, processCheckout } = useEcommerce();
+  const { cart, removeFromCart, updateQuantity, cartTotal } = useEcommerce();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [checkoutError, setCheckoutError] = useState('');
 
-  const handleCheckout = async () => {
+  const handleCheckout = () => {
     // In a real app, this would handle the Stripe or Razorpay integration
     setIsCheckingOut(true);
     setCheckoutError('');
     
-    try {
-      // Process the checkout with our MongoDB integration
-      const success = await processCheckout();
-      
-      if (success) {
-        // In a real app, would redirect to confirmation page
-        toast.success("Order placed successfully! Thank you for your purchase.");
-        
-        // Simulate redirect to confirmation
-        setTimeout(() => {
-          toast("For this demo, we would typically redirect to a confirmation page");
-        }, 2000);
-      } else {
-        setCheckoutError("There was a problem processing your order. Please try again.");
-      }
-    } catch (error) {
-      console.error("Checkout error:", error);
-      setCheckoutError("There was a problem processing your order. Please try again.");
-    } finally {
+    // Simulate payment processing
+    setTimeout(() => {
+      // For demo purposes, we'll simulate success
       setIsCheckingOut(false);
-    }
+      // In a real app, would redirect to confirmation page or show success message
+      alert('For this demo, we are simulating a successful payment! In a real app, this would integrate with Stripe or Razorpay.');
+    }, 2000);
   };
-
-  // Calculate total carbon saved
-  const totalCarbonSaved = cart.reduce((total, item) => total + (item.carbonSaved * item.quantity), 0);
 
   if (cart.length === 0) {
     return (
@@ -147,54 +129,18 @@ const CartPage = () => {
               </div>
             </div>
             
-            {/* Environment Impact - Enhanced */}
+            {/* Environment Impact */}
             <div className="mt-6 bg-eco-light p-6 rounded-lg shadow-sm">
-              <h3 className="text-lg font-medium text-eco-dark mb-2 flex items-center">
-                <Leaf className="h-5 w-5 text-eco-primary mr-2" />
-                Your Environmental Impact
-              </h3>
+              <h3 className="text-lg font-medium text-eco-dark mb-2">Your Environmental Impact</h3>
               <p className="text-sm text-gray-700 mb-4">
-                By purchasing pre-owned electronics through QuickCart, you're helping to reduce e-waste and carbon emissions.
+                By purchasing pre-owned electronics through Eco-Mart, you're helping to reduce e-waste and carbon emissions.
               </p>
               
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="bg-white rounded-md p-3 flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
-                    <Leaf className="h-5 w-5 text-green-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">Total CO₂ saved</div>
-                    <div className="font-bold text-lg text-eco-dark">{totalCarbonSaved} kg</div>
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-md p-3 flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
-                    <Shield className="h-5 w-5 text-blue-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">Warranty Protection</div>
-                    <div className="font-bold text-lg text-eco-dark">
-                      {cart.some(item => item.condition === 'Refurbished' || item.condition === 'New') ? 'Up to 2 years' : 'Standard'}
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white rounded-md p-3 flex items-center">
-                  <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
-                    <Award className="h-5 w-5 text-purple-600" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-gray-600">Verified Sellers</div>
-                    <div className="font-bold text-lg text-eco-dark">
-                      {cart.some(item => ['EcoTech', 'GreenHome', 'RenewTech', 'SolarPower'].includes(item.seller)) ? 'Included' : 'Some Items'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-4 text-xs text-gray-600">
-                * Each kg of CO₂ saved is equivalent to driving approximately 4 miles in an average car.
+              <div className="flex items-center text-eco-dark">
+                <span className="font-medium">Total CO₂ saved:</span>
+                <span className="ml-2 font-bold">
+                  {cart.reduce((total, item) => total + (item.carbonSaved * item.quantity), 0)} kg
+                </span>
               </div>
             </div>
           </div>

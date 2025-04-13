@@ -1,10 +1,7 @@
 
 import React, { createContext, useState, useEffect, useContext } from 'react';
-import { getAllProducts, addProduct } from '../services/productService';
-import { getCartItems, addToCart as addItemToCart, removeFromCart as removeItemFromCart, updateCartItemQuantity, clearCart } from '../services/cartService';
-import { toast } from "sonner";
 
-// Initial sample products data (will be used as fallback)
+// Initial sample products data
 const initialProducts = [
   {
     id: 1,
@@ -85,148 +82,58 @@ export const useEcommerce = () => {
 };
 
 export const EcommerceProvider = ({ children }) => {
-  const [products, setProducts] = useState(initialProducts);
-  const [cart, setCart] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState('');
-  const [userId, setUserId] = useState('guest'); // For future authentication
+  // Load cart from localStorage on initial render
+  const [products, setProducts] = useState(() => {
+    // Here we would typically fetch from an API or database
+    return initialProducts;
+  });
+  
+  const [cart, setCart] = useState(() => {
+    const savedCart = localStorage.getItem('eco_mart_cart');
+    return savedCart ? JSON.parse(savedCart) : [];
+  });
 
-  // Load products from database on initial render
-  useEffect(() => {
-    const fetchProducts = async () => {
-      setIsLoading(true);
-      try {
-        const dbProducts = await getAllProducts();
-        
-        // If we have products in the database, use them
-        if (dbProducts && dbProducts.length > 0) {
-          setProducts(dbProducts);
-        } else {
-          // If the database is empty, use initial products
-          console.log("No products found in database, using initial sample data");
-          
-          // In a real app, you might want to populate the database with initial products
-          // This would typically happen during first setup
-        }
-      } catch (error) {
-        console.error("Failed to fetch products:", error);
-        setErrorMessage("Failed to load products. Using sample data instead.");
-        toast.error("Failed to connect to database. Using sample data.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  // Load cart from database on initial render
-  useEffect(() => {
-    const fetchCart = async () => {
-      try {
-        const cartItems = await getCartItems(userId);
-        setCart(cartItems);
-      } catch (error) {
-        console.error("Failed to fetch cart:", error);
-        
-        // Fallback to localStorage if database fails
-        const savedCart = localStorage.getItem('eco_mart_cart');
-        if (savedCart) {
-          setCart(JSON.parse(savedCart));
-        }
-      }
-    };
-
-    fetchCart();
-  }, [userId]);
-
-  // Save cart to localStorage as backup
+  // Save cart to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem('eco_mart_cart', JSON.stringify(cart));
   }, [cart]);
 
   // Add product to cart
-  const addToCart = async (product) => {
-    try {
-      const updatedCart = await addItemToCart(userId, product);
-      setCart(updatedCart);
-    } catch (error) {
-      console.error("Error in addToCart:", error);
+  const addToCart = (product) => {
+    setCart(prevCart => {
+      // Check if product is already in cart
+      const existingItem = prevCart.find(item => item.id === product.id);
       
-      // Fallback to local state management if database fails
-      setCart(prevCart => {
-        const existingItem = prevCart.find(item => item.id === product.id);
-        
-        if (existingItem) {
-          return prevCart.map(item => 
-            item.id === product.id 
-              ? { ...item, quantity: item.quantity + 1 }
-              : item
-          );
-        } else {
-          return [...prevCart, { ...product, quantity: 1 }];
-        }
-      });
-    }
+      if (existingItem) {
+        // If it exists, increase quantity
+        return prevCart.map(item => 
+          item.id === product.id 
+            ? { ...item, quantity: item.quantity + 1 }
+            : item
+        );
+      } else {
+        // If not, add new item with quantity 1
+        return [...prevCart, { ...product, quantity: 1 }];
+      }
+    });
   };
 
   // Remove product from cart
-  const removeFromCart = async (productId) => {
-    try {
-      const updatedCart = await removeItemFromCart(userId, productId);
-      setCart(updatedCart);
-    } catch (error) {
-      console.error("Error in removeFromCart:", error);
-      
-      // Fallback to local state management
-      setCart(prevCart => prevCart.filter(item => item.id !== productId));
-    }
+  const removeFromCart = (productId) => {
+    setCart(prevCart => prevCart.filter(item => item.id !== productId));
   };
 
   // Update quantity of product in cart
-  const updateQuantity = async (productId, quantity) => {
+  const updateQuantity = (productId, quantity) => {
     if (quantity < 1) return;
     
-    try {
-      const updatedCart = await updateCartItemQuantity(userId, productId, quantity);
-      setCart(updatedCart);
-    } catch (error) {
-      console.error("Error in updateQuantity:", error);
-      
-      // Fallback to local state management
-      setCart(prevCart => 
-        prevCart.map(item => 
-          item.id === productId 
-            ? { ...item, quantity }
-            : item
-        )
-      );
-    }
-  };
-
-  // Add a new product (for sell functionality)
-  const addNewProduct = async (newProduct) => {
-    try {
-      const productWithId = await addProduct({
-        ...newProduct,
-        seller: userId, // In real app, this would be the logged-in user
-      });
-      
-      setProducts(prevProducts => [...prevProducts, productWithId]);
-      return productWithId;
-    } catch (error) {
-      console.error("Error in addNewProduct:", error);
-      
-      // Fallback to local state management
-      const productWithId = {
-        ...newProduct,
-        id: String(products.length + 1), // Simple ID generation for demo
-        seller: "User" // In real app, this would be the logged-in user
-      };
-      
-      setProducts(prevProducts => [...prevProducts, productWithId]);
-      return productWithId;
-    }
+    setCart(prevCart => 
+      prevCart.map(item => 
+        item.id === productId 
+          ? { ...item, quantity }
+          : item
+      )
+    );
   };
 
   // Calculate total items in cart
@@ -235,19 +142,17 @@ export const EcommerceProvider = ({ children }) => {
   // Calculate total price
   const cartTotal = cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 
-  // Add checkout process
-  const processCheckout = async () => {
-    try {
-      // In a real app, this would involve payment processing
-      await clearCart(userId);
-      setCart([]);
-      toast.success("Checkout successful! Thank you for your purchase.");
-      return true;
-    } catch (error) {
-      console.error("Checkout failed:", error);
-      toast.error("Checkout failed. Please try again.");
-      return false;
-    }
+  // Add a new product (for sell functionality)
+  const addNewProduct = (newProduct) => {
+    // In a real app, this would involve API calls
+    const productWithId = {
+      ...newProduct,
+      id: products.length + 1, // Simple ID generation for demo
+      seller: "User" // In real app, this would be the logged-in user
+    };
+    
+    setProducts(prevProducts => [...prevProducts, productWithId]);
+    return productWithId;
   };
 
   const value = {
@@ -258,10 +163,7 @@ export const EcommerceProvider = ({ children }) => {
     addToCart,
     removeFromCart,
     updateQuantity,
-    addNewProduct,
-    processCheckout,
-    isLoading,
-    errorMessage
+    addNewProduct
   };
 
   return (
