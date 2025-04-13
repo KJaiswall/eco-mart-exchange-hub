@@ -1,14 +1,25 @@
+
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { ShoppingCart, Menu, X, Search, ShoppingBag } from 'lucide-react';
 import { useEcommerce } from '../contexts/EcommerceContext';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
   const { cartItemCount } = useEcommerce();
+  const navigate = useNavigate();
   
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchTerm.trim()) {
+      navigate(`/buy?search=${encodeURIComponent(searchTerm)}`);
+      setIsMenuOpen(false);
+    }
   };
 
   return (
@@ -38,16 +49,19 @@ const Navbar = () => {
           </div>
           
           <div className="hidden sm:flex items-center">
-            <div className="relative rounded-md shadow-sm mr-4">
+            <form onSubmit={handleSearch} className="relative rounded-md shadow-sm mr-4">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
               </div>
               <input
                 type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="focus:ring-eco-primary focus:border-eco-primary block w-full pl-10 sm:text-sm border-gray-300 rounded-md py-2 pr-3"
                 placeholder="Search products..."
               />
-            </div>
+              <button type="submit" className="hidden">Search</button>
+            </form>
             
             <Link to="/cart" className="relative p-2 rounded-full text-gray-600 hover:text-eco-primary focus:outline-none">
               <ShoppingCart className="h-6 w-6" />
@@ -86,16 +100,19 @@ const Navbar = () => {
               About
             </Link>
             
-            <div className="relative rounded-md shadow-sm mx-3 mt-3">
+            <form onSubmit={handleSearch} className="relative rounded-md shadow-sm mx-3 mt-3">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                 <Search className="h-4 w-4 text-gray-400" />
               </div>
               <input
                 type="text"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 className="focus:ring-eco-primary focus:border-eco-primary block w-full pl-10 text-sm border-gray-300 rounded-md py-2"
                 placeholder="Search products..."
               />
-            </div>
+              <button type="submit" className="hidden">Search</button>
+            </form>
             
             <Link to="/cart" className="flex items-center px-3 py-2 text-base font-medium text-eco-dark hover:bg-eco-light" onClick={toggleMenu}>
               <ShoppingCart className="h-5 w-5 mr-2" />

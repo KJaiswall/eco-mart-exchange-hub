@@ -142,6 +142,18 @@ export const EcommerceProvider = ({ children }) => {
     localStorage.removeItem('eco_mart_cart');
   };
 
+  // Search for products
+  const searchProducts = (searchTerm) => {
+    if (!searchTerm) return products;
+    
+    const term = searchTerm.toLowerCase();
+    return products.filter(product => 
+      product.title.toLowerCase().includes(term) || 
+      product.description.toLowerCase().includes(term) ||
+      product.category.toLowerCase().includes(term)
+    );
+  };
+
   // Calculate total items in cart
   const cartItemCount = cart.reduce((total, item) => total + item.quantity, 0);
   
@@ -170,7 +182,8 @@ export const EcommerceProvider = ({ children }) => {
     removeFromCart,
     updateQuantity,
     clearCart,
-    addNewProduct
+    addNewProduct,
+    searchProducts
   };
 
   return (
