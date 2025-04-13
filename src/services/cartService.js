@@ -1,11 +1,31 @@
-
 import { getCollection } from '../utils/dbConnect';
 import { toast } from "sonner";
 
 export async function getCartItems(userId = 'guest') {
   try {
     const collection = await getCollection('cart');
-    const items = await collection.find({ userId }).toArray();
+    const cursor = collection.find({ userId });
+    
+    let items = [];
+    if (cursor.toArray) {
+      items = await cursor.toArray();
+    } else {
+      items = await new Promise((resolve) => {
+        const results = [];
+        const processNext = () => {
+          cursor.next().then(doc => {
+            if (doc) {
+              results.push(doc);
+              processNext();
+            } else {
+              resolve(results);
+            }
+          }).catch(() => resolve(results));
+        };
+        processNext();
+      });
+    }
+    
     return items.map(item => ({
       ...item,
       id: item.productId // Map _id to id to match our application structure
@@ -13,7 +33,6 @@ export async function getCartItems(userId = 'guest') {
   } catch (error) {
     console.error("Failed to fetch cart items:", error);
     toast.error("Failed to load your cart");
-    // Return empty array even on error to prevent UI breakage
     return [];
   }
 }
@@ -22,21 +41,23 @@ export async function addToCart(userId = 'guest', product) {
   try {
     const collection = await getCollection('cart');
     
-    // Check if product already exists in cart
-    const existingItem = await collection.findOne({ 
-      userId, 
-      productId: product.id 
-    });
+    let existingItem = null;
+    const cursor = collection.find({ userId, productId: product.id });
+    
+    if (cursor.toArray) {
+      const items = await cursor.toArray();
+      existingItem = items[0];
+    } else {
+      existingItem = await cursor.next();
+    }
     
     if (existingItem) {
-      // Update quantity
       await collection.updateOne(
         { userId, productId: product.id },
         { $inc: { quantity: 1 } }
       );
       toast.success("Item quantity updated");
     } else {
-      // Add new item
       await collection.insertOne({
         userId,
         productId: product.id,
@@ -52,14 +73,11 @@ export async function addToCart(userId = 'guest', product) {
       toast.success("Item added to cart");
     }
     
-    // Get updated cart items
     return await getCartItems(userId);
   } catch (error) {
     console.error("Failed to add item to cart:", error);
     toast.error("Failed to add item to cart");
     
-    // Return the current cart state instead of throwing the error
-    // This prevents breaking the UI flow
     return await getCartItems(userId);
   }
 }
@@ -73,7 +91,6 @@ export async function removeFromCart(userId = 'guest', productId) {
   } catch (error) {
     console.error("Failed to remove item from cart:", error);
     toast.error("Failed to remove item");
-    // Return current cart items instead of throwing
     return await getCartItems(userId);
   }
 }
@@ -92,7 +109,6 @@ export async function updateCartItemQuantity(userId = 'guest', productId, quanti
   } catch (error) {
     console.error("Failed to update item quantity:", error);
     toast.error("Failed to update quantity");
-    // Return current cart items instead of throwing
     return await getCartItems(userId);
   }
 }
@@ -106,7 +122,6 @@ export async function clearCart(userId = 'guest') {
   } catch (error) {
     console.error("Failed to clear cart:", error);
     toast.error("Failed to clear cart");
-    // Return empty array instead of throwing
     return [];
   }
 }
